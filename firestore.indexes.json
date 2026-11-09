@@ -1,0 +1,33 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "days",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "calendarDate",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timezoneOffsetHours",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "regimen_eras",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "startDate",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "endDate",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

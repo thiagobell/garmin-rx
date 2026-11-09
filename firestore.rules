@@ -1,0 +1,71 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email_verified == true;
+    }
+
+    function accessConfigExists() {
+      return exists(/databases/$(database)/documents/config/access);
+    }
+
+    function accessConfig() {
+      return get(/databases/$(database)/documents/config/access).data;
+    }
+
+    // Owner check: strictly matches config/access.ownerEmail
+    function isOwner() {
+      return isSignedIn()
+        && accessConfigExists()
+        && request.auth.token.email == accessConfig().ownerEmail;
+    }
+
+    // Doctor / Allowed Viewer check: Owner OR listed in config/access.allowedViewerEmails
+    function isAuthorizedViewer() {
+      return isOwner() || (
+        isSignedIn()
+        && accessConfigExists()
+        && (request.auth.token.email in accessConfig().allowedViewerEmails)
+      );
+    }
+
+    // Access & PK Configuration
+    match /config/access {
+      allow read: if isAuthorizedViewer();
+      allow write: if isOwner();
+    }
+
+    // Daily Biometric Summary Documents
+    match /days/{date} {
+      allow read: if isAuthorizedViewer();
+      allow write: if isOwner();
+
+      // On-demand high-resolution 2-min HR, 5-min HRV, and Body Battery series
+      match /intraday/{docId} {
+        allow read: if isAuthorizedViewer();
+        allow write: if isOwner();
+      }
+    }
+
+    // Doctor-visible Medication Doses, Caffeine, Side-Effect Pins, EOD Ratings & Context Tags
+    match /day_logs/{date} {
+      allow read: if isAuthorizedViewer();
+      allow write: if isOwner();
+    }
+
+    // Medication Regimen Eras (e.g. Pre-Treatment vs Treatment)
+    match /regimen_eras/{eraId} {
+      allow read: if isAuthorizedViewer();
+      allow write: if isOwner();
+    }
+
+    // Strictly Owner-Only Private Notes (NEVER readable by Doctor / Viewer)
+    match /private_notes/{date} {
+      allow read, write: if isOwner();
+    }
+  }
+}

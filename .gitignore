@@ -1,0 +1,38 @@
+# Python / Local CLI
+.venv/
+.env
+.env.*
+!.env.example
+.token_cache.json
+__pycache__/
+*.pyc
+
+# Raw & Compiled Biometric Data
+data/
+data/processed_seed.json
+web/public/processed_seed.json
+garmin_openapi_spec.json
+
+# Node / TypeScript / Firebase
+web/.env
+web/.env.*
+!web/.env.example
+.firebaserc
+!.firebaserc.example
+node_modules/
+dist/
+lib/
+*.tsbuildinfo
+web/dist/
+functions/node_modules/
+functions/lib/
+web/node_modules/
+web/dist/
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+firestore-debug.log
+ui-debug.log
+
+# Editor drafts / leftovers
+*.ts.new
